@@ -30,6 +30,7 @@ class FtrlEstimator:
         self._current_feat_vals = feature_values
 
         logit = 0
+        self._w.clear() # lazy weights，所以没有必要保留之前的weights
 
         # 如果当前样本在这个field下所有feature都为0，则feature_ids==feature_values==[]
         # 则没有以下循环，logit=0
@@ -39,9 +40,8 @@ class FtrlEstimator:
 
             # build w on the fly using z and n, hence the name - lazy weights
             # this allows us for not storing the complete w
-            if abs(z) <= self._L1:
-                self._w[feat_id] = 0.  # w[i] vanishes due to L1 regularization
-            else:
+            # if abs(z) <= self._L1: self._w[feat_id] = 0.  # w[i] vanishes due to L1 regularization
+            if abs(z) > self._L1:
                 # apply prediction time L1, L2 regularization to z and get w
                 w = (sign_z * self._L1 - z) / ((self._beta + np.sqrt(self._n[feat_id])) / self._alpha + self._L2)
                 self._w[feat_id] = w
@@ -63,7 +63,10 @@ class FtrlEstimator:
             g2 = g * g
             n = self._n[feat_id]
 
-            sigma = (np.sqrt(n + g2) - np.sqrt(n)) / self._alpha
-            self._z[feat_id] += g - sigma * self._w[feat_id]
+            self._z[feat_id] += g
+
+            if feat_id in self._w: # if self._w[feat_id] != 0
+                sigma = (np.sqrt(n + g2) - np.sqrt(n)) / self._alpha
+                self._z[feat_id] -= sigma * self._w[feat_id]
 
             self._n[feat_id] = n + g2

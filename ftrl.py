@@ -15,7 +15,13 @@ class FtrlEstimator:
 
         self._n = defaultdict(float)  # n[i]: i-th feature's squared sum of past gradients
         self._z = defaultdict(float)
-        self._w = {}  # lazy weights
+
+        # lazy weights, 实际上是一个临时变量，只在：
+        # 1. 对应的feature value != 0, 并且
+        # 2. 之前累积的abs(z) > L1
+        # 两种情况都满足时，w才在feature id对应的位置上存储一个值
+        # 而且w中数据的存储周期，只在一次前代、回代之间，在新的前代开始之前，就清空上次的w
+        self._w = {}
 
         self._current_feat_ids = None
         self._current_feat_vals = None

@@ -1,4 +1,5 @@
 
+*.pyc
 .idea
 learn_curve_*.csv
 log_*.log

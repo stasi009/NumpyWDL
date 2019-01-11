@@ -8,6 +8,7 @@ class EmbeddingLayer:
     简化起见，不支持use_bias和regularization
     不支持regularization的原因是：weight是稠密的，自然L2 Loss的gradient也是稠密的
     为了L2 Loss而破坏稀疏性，增加内容与耗时，有些得不偿失
+    一种改进方案是：只正则化本batch中用到的embedding向量
     """
 
     def __init__(self, W, vocab_name, field_name):

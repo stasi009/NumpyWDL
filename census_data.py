@@ -137,6 +137,11 @@ class Dataset:
 
                 # ------------- allocate for numeric feature
                 for field in DENSE_FIELDS:
+                    # Xs[field]应该是一个list of list
+                    # 外面的list，对应batch中的每个example
+                    # 内层的list，对应该样本在field下的值。
+                    # 某样本可以在某个field下有多个dense值，比如当你非要用OHE来表示categorical特征的时候
+                    # 只不过，这里每个样本在每个field下只有一个值
                     Xs[field] = []
 
                 # ------------- loop and add
